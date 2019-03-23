@@ -1,15 +1,21 @@
 SHELL=/bin/bash
-BINARY_NAME := "csctl"
+PROJECT_NAME ?= csctl
+BINARY_NAME ?= ${PROJECT_NAME}
+PKG ?= github.com/containership/${PROJECT_NAME}
 PKG_LIST := $(shell go list ./...)
 GO_FILES := $(shell find . -type f -not -path './vendor/*' -name '*.go')
 
+LDFLAGS := "-X ${PKG}/pkg/buildinfo.gitDescribe=`git describe --dirty 2>/dev/null` \
+	-X ${PKG}/pkg/buildinfo.gitCommit=`git rev-parse --short HEAD` \
+	-X ${PKG}/pkg/buildinfo.unixTime=`date '+%s'`"
+
 .PHONY: all
 all: dep ## (default) Build the binary
-	@go build
+	@go build -ldflags ${LDFLAGS}
 
 .PHONY: install
 install: dep ## Install the binary
-	@go install
+	@go install -ldflags ${LDFLAGS}
 
 .PHONY: dep
 dep: # Resolve / install dependencies

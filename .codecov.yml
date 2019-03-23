@@ -4,9 +4,10 @@ coverage:
       default:
         target: 70
 
-# TODO re-enable coverage checking for the following cmd files
 ignore:
   - "cloud/*/types"
+  - "pkg/buldinfo"
+    # TODO re-enable coverage checking for the following cmd files
   - "/cmd/create*"
   - "/cmd/delete*"
   - "/cmd/export*"
