@@ -25,7 +25,8 @@ var scaleCmd = &cobra.Command{
 
 	Args: cobra.NoArgs,
 
-	PreRunE: nodePoolScopedPreRunE,
+	PersistentPreRunE: clientsetRequiredPreRunE,
+	PreRunE:           nodePoolScopedPreRunE,
 
 	RunE: func(cmd *cobra.Command, args []string) error {
 		np, err := clientset.Provision().NodePools(organizationID, clusterID).Get(nodePoolID)
@@ -101,6 +102,7 @@ func exactlyOneSet(v1, v2, v3 int32) bool {
 func init() {
 	rootCmd.AddCommand(scaleCmd)
 
+	requireClientset(scaleCmd)
 	bindCommandToNodePoolScope(scaleCmd, false)
 
 	scaleCmd.Flags().Int32VarP(&upCount, "up", "u", countUnset, "scale up by N nodes")

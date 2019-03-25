@@ -62,10 +62,14 @@ func getMyAccountID() (string, error) {
 var getCmd = &cobra.Command{
 	Use:   "get",
 	Short: "Get a resource",
+
+	PersistentPreRunE: clientsetRequiredPreRunE,
 }
 
 func init() {
 	rootCmd.AddCommand(getCmd)
+
+	requireClientset(getCmd)
 
 	getCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "", "output format")
 	getCmd.PersistentFlags().BoolVarP(&mineOnly, "mine", "m", false, "only list resources your user owns")

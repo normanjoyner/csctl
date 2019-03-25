@@ -8,8 +8,12 @@ import (
 var upgradeCmd = &cobra.Command{
 	Use:   "upgrade",
 	Short: "Upgrade a cluster node pool or resource",
+
+	PersistentPreRunE: clientsetRequiredPreRunE,
 }
 
 func init() {
 	rootCmd.AddCommand(upgradeCmd)
+
+	requireClientset(upgradeCmd)
 }

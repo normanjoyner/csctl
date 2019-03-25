@@ -8,8 +8,12 @@ import (
 var deleteCmd = &cobra.Command{
 	Use:   "delete",
 	Short: "Delete a resource",
+
+	PersistentPreRunE: clientsetRequiredPreRunE,
 }
 
 func init() {
 	rootCmd.AddCommand(deleteCmd)
+
+	requireClientset(deleteCmd)
 }

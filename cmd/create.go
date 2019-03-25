@@ -8,8 +8,12 @@ import (
 var createCmd = &cobra.Command{
 	Use:   "create",
 	Short: "Create a resource",
+
+	PersistentPreRunE: clientsetRequiredPreRunE,
 }
 
 func init() {
 	rootCmd.AddCommand(createCmd)
+
+	requireClientset(createCmd)
 }

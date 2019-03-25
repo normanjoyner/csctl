@@ -31,7 +31,7 @@ var (
 	clientset cloud.Interface
 )
 
-func orgScopedPreRunE(cmd *cobra.Command, args []string) error {
+func orgScopedPreRunE(cmd *cobra.Command, _ []string) error {
 	organizationID = viper.GetString("organization")
 	if organizationID == "" {
 		return errors.New("please specify an organization via --organization or config file")
@@ -40,8 +40,8 @@ func orgScopedPreRunE(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func clusterScopedPreRunE(cmd *cobra.Command, args []string) error {
-	if err := orgScopedPreRunE(cmd, args); err != nil {
+func clusterScopedPreRunE(cmd *cobra.Command, _ []string) error {
+	if err := orgScopedPreRunE(cmd, nil); err != nil {
 		return err
 	}
 
@@ -53,8 +53,8 @@ func clusterScopedPreRunE(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func nodePoolScopedPreRunE(cmd *cobra.Command, args []string) error {
-	if err := clusterScopedPreRunE(cmd, args); err != nil {
+func nodePoolScopedPreRunE(cmd *cobra.Command, _ []string) error {
+	if err := clusterScopedPreRunE(cmd, nil); err != nil {
 		return err
 	}
 
@@ -64,6 +64,23 @@ func nodePoolScopedPreRunE(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
+}
+
+func clientsetRequiredPreRunE(cmd *cobra.Command, _ []string) error {
+	userToken = viper.GetString("token")
+	if userToken == "" {
+		return errors.New("please specify a token via --token or config file")
+	}
+
+	var err error
+	clientset, err = cloud.New(cloud.Config{
+		Token:            userToken,
+		APIBaseURL:       viper.GetString("apiBaseURL"),
+		ProvisionBaseURL: viper.GetString("provisionBaseURL"),
+		DebugEnabled:     debugEnabled,
+	})
+
+	return err
 }
 
 func bindCommandToOrganizationScope(cmd *cobra.Command, persistent bool) {
@@ -106,6 +123,13 @@ func bindCommandToNodePoolScope(cmd *cobra.Command, persistent bool) {
 	viper.BindPFlag("node-pool", flagset.Lookup("node-pool"))
 }
 
+// assumes that if a clientset is required for a command,
+// it should be persistent (required for all subcommands)
+func requireClientset(cmd *cobra.Command) {
+	cmd.PersistentFlags().StringVar(&userToken, "token", "", "Containership Cloud token to use")
+	viper.BindPFlag("token", cmd.PersistentFlags().Lookup("token"))
+}
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "csctl",
@@ -114,23 +138,6 @@ var rootCmd = &cobra.Command{
 
 This is a long description`,
 	SilenceUsage: true,
-
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		userToken = viper.GetString("token")
-		if userToken == "" {
-			return errors.New("please specify a token in your config file")
-		}
-
-		var err error
-		clientset, err = cloud.New(cloud.Config{
-			Token:            userToken,
-			APIBaseURL:       viper.GetString("apiBaseURL"),
-			ProvisionBaseURL: viper.GetString("provisionBaseURL"),
-			DebugEnabled:     debugEnabled,
-		})
-
-		return err
-	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -150,6 +157,9 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ~/.containership/csctl.yaml)")
 
 	rootCmd.PersistentFlags().BoolVar(&debugEnabled, "debug", false, "enable/disable debug mode (trace all HTTP requests)")
+
+	rootCmd.PersistentFlags().StringVar(&userToken, "token", "", "Containership token to authenticate with")
+	viper.BindPFlag("token", rootCmd.PersistentFlags().Lookup("token"))
 }
 
 // initConfig reads in config file and ENV variables if set.
