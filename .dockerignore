@@ -1,0 +1,21 @@
+# git
+.git
+.gitignore
+.github
+
+# go vendoring
+/vendor
+
+# Docker
+.dockerignore
+Dockerfile*
+
+# CI
+.circleci
+.codecov.yml
+
+# misc
+*.log
+*.conf
+LICENSE
+README*

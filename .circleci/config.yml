@@ -33,9 +33,27 @@ jobs:
     working_directory: /go/src/github.com/containership/csctl
     steps:
       - checkout
+      - setup_remote_docker
       - run:
-          name: Default build
-          command: make
+          name: Docker build
+          command: make docker
+
+  build-and-publish:
+    docker:
+      - image: circleci/golang:1.11.4
+    working_directory: /go/src/github.com/containership/csctl
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: |
+            export IMAGE_NAME=$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+            export IMAGE_TAG=`if [ -z $CIRCLE_TAG ]; then echo latest; else echo $CIRCLE_TAG; fi`
+            echo "Building Docker image $IMAGE_NAME:$IMAGE_TAG"
+            make docker
+            echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+            echo "Pushing Docker image $IMAGE_NAME:$IMAGE_TAG"
+            docker push $IMAGE_NAME:$IMAGE_TAG
+            docker logout
 
 workflows:
   version: 2
@@ -43,4 +61,36 @@ workflows:
   commit:
     jobs:
       - test
-      - build
+
+      - build:
+          filters:
+            branches:
+              ignore: master # master runs the publish job instead
+
+      - build-and-publish:
+          context: containershipbot
+          requires:
+            - test
+          filters:
+            branches:
+              only:
+                - master
+
+  release:
+    jobs:
+      - test:
+          filters:  # filters are required to match build-and-publish job since it requires this one
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+
+      - build-and-publish:
+          context: containershipbot
+          requires:
+            - test
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/

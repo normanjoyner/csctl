@@ -13,7 +13,7 @@ For more info, please refer to [the client documentation](cloud/README.md)
 
 ## Installing
 
-Currently the only way to install `csctl` is through go:
+To install the `csctl` binary, simply run:
 
 ```
 go get -u github.com/containership/csctl
@@ -25,8 +25,24 @@ Alternatively, you can clone this repository and install via `make`:
 make install
 ```
 
-More installation methods will be added in the future as the project matures.
-There are no official releases yet.
+### Docker
+
+Docker images are also provided for users that don't want to install the binary.
+For example, to run the `latest` tag:
+
+```
+docker run containership/csctl <args>
+```
+
+Here's a convenient shell alias for running the `latest` Docker image with the config file at the default location mounted in:
+
+```
+alias csctl="docker run \
+            --mount type=bind,source=$HOME/.containership/csctl.yaml,target=/app/csctl.yaml \
+            containership/csctl --config /app/csctl.yaml"
+```
+
+Now it can be invoked as `csctl <args>` as usual.
 
 ## Usage
 

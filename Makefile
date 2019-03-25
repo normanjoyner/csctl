@@ -2,12 +2,18 @@ SHELL=/bin/bash
 PROJECT_NAME ?= csctl
 BINARY_NAME ?= ${PROJECT_NAME}
 PKG ?= github.com/containership/${PROJECT_NAME}
+IMAGE_NAME ?= containership/${PROJECT_NAME}
+IMAGE_TAG ?= latest
 PKG_LIST := $(shell go list ./...)
 GO_FILES := $(shell find . -type f -not -path './vendor/*' -name '*.go')
 
-LDFLAGS := "-X ${PKG}/pkg/buildinfo.gitDescribe=`git describe --dirty 2>/dev/null` \
-	-X ${PKG}/pkg/buildinfo.gitCommit=`git rev-parse --short HEAD` \
-	-X ${PKG}/pkg/buildinfo.unixTime=`date '+%s'`"
+GIT_DESCRIBE=$(shell git describe --dirty 2>/dev/null)
+GIT_COMMIT=$(shell git rev-parse --short HEAD)
+DATESTAMP=$(shell date '+%s')
+
+LDFLAGS := "-X ${PKG}/pkg/buildinfo.gitDescribe=${GIT_DESCRIBE} \
+	-X ${PKG}/pkg/buildinfo.gitCommit=${GIT_COMMIT} \
+	-X ${PKG}/pkg/buildinfo.unixTime=${DATESTAMP}"
 
 .PHONY: all
 all: dep ## (default) Build the binary
@@ -16,6 +22,12 @@ all: dep ## (default) Build the binary
 .PHONY: install
 install: dep ## Install the binary
 	@go install -ldflags ${LDFLAGS}
+
+.PHONY: docker
+docker: ## Build the Docker image
+	@docker image build -t ${IMAGE_NAME}:${IMAGE_TAG} . \
+		--build-arg GIT_DESCRIBE=${GIT_DESCRIBE} \
+		--build-arg GIT_COMMIT=${GIT_COMMIT} \
 
 .PHONY: dep
 dep: # Resolve / install dependencies
