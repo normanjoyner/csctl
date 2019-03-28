@@ -13,11 +13,13 @@ const (
 // Interface is the interface for Provision
 type Interface interface {
 	RESTClient() rest.Interface
+
 	CKEClustersGetter
 	TemplatesGetter
 	NodePoolsGetter
-	AutoscalingPoliciesGetter
 	NodesGetter
+	AutoscalingPoliciesGetter
+	NodePoolLabelsGetter
 }
 
 // Client is the Provision client
@@ -71,4 +73,9 @@ func (c *Client) AutoscalingPolicies(organizationID, clusterID string) Autoscali
 // Nodes returns the nodes interface
 func (c *Client) Nodes(organizationID, clusterID, nodePoolID string) NodeInterface {
 	return newNodes(c, organizationID, clusterID, nodePoolID)
+}
+
+// NodePoolLabels returns the nodes interface
+func (c *Client) NodePoolLabels(organizationID, clusterID, nodePoolID string) NodePoolLabelInterface {
+	return newNodePoolLabels(c, organizationID, clusterID, nodePoolID)
 }

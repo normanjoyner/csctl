@@ -243,6 +243,68 @@ paths:
           schema:
             $ref: "#/definitions/Error"
 
+  /organizations/{organization_id}/clusters/{cluster_id}/node-pools/{node_pool_id}/labels:
+    get:
+      summary: List all labels in a given node pool
+      operationId: listLabels
+      tags:
+        - labels
+      parameters:
+        - in: path
+          name: organization_id
+          required: true
+          type: string
+        - in: path
+          name: cluster_id
+          required: true
+          type: string
+        - in: path
+          name: node_pool_id
+          required: true
+          type: string
+      responses:
+        "200":
+          description: A list of labels
+          schema:
+            $ref: "#/definitions/NodePoolLabels"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /organizations/{organization_id}/clusters/{cluster_id}/node-pools/{node_pool_id}/labels/{label_id}:
+    get:
+      summary: Get a label
+      operationId: getLabel
+      tags:
+        - label
+      parameters:
+        - in: path
+          name: organization_id
+          required: true
+          type: string
+        - in: path
+          name: cluster_id
+          required: true
+          type: string
+        - in: path
+          name: node_pool_id
+          required: true
+          type: string
+        - in: path
+          name: label_id
+          required: true
+          type: string
+      responses:
+        "200":
+          description: A label
+          schema:
+            $ref: "#/definitions/NodePoolLabel"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+
   /organizations/{organization_id}/templates:
     get:
       summary: List all provisioning templates for a given organization
@@ -547,6 +609,36 @@ definitions:
       kubernetes_version:
         title: Kubernetes version to upgrade (or downgrade) to
         type: string
+
+  NodePoolLabels:
+    type: array
+    items:
+      $ref: "#/definitions/NodePoolLabel"
+
+  NodePoolLabel:
+    type: object
+    required:
+      - key
+      - value
+    properties:
+      created_at:
+        title: Timestamp at which the label was created
+        type: string
+      updated_at:
+        title: Timestamp at which the label was updated
+        type: string
+      id:
+        title: Node pool label ID
+        $ref: "#/definitions/UUID"
+      key:
+        title: Label key
+        type: string
+      value:
+        title: Label value
+        type: string
+      node_pool_id:
+        title: ID of the node pool this label belongs to
+        $ref: "#/definitions/UUID"
 
   AutoscalingPolicy:
     type: object
