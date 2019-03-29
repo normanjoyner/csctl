@@ -22,6 +22,7 @@ type Interface interface {
 	PluginCatalogGetter
 	UsersGetter
 	RegistryGetter
+	ClusterLabelsGetter
 }
 
 // Client is the API client
@@ -95,4 +96,9 @@ func (c *Client) Users(organizationID string) UserInterface {
 // Registries returns the registries interface
 func (c *Client) Registries(organizationID string) RegistryInterface {
 	return newRegistry(c, organizationID)
+}
+
+// ClusterLabels returns the clusterLabels interface
+func (c *Client) ClusterLabels(organizationID, clusterID string) ClusterLabelInterface {
+	return newClusterLabels(c, organizationID, clusterID)
 }

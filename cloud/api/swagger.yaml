@@ -176,6 +176,60 @@ paths:
           schema:
             $ref: "#/definitions/Error"
 
+  /organizations/{organization_id}/clusters/{cluster_id}/labels:
+    get:
+      summary: List all labels for a given cluster
+      operationId: listLabels
+      tags:
+        - labels
+      parameters:
+        - in: path
+          name: organization_id
+          required: true
+          type: string
+        - in: path
+          name: cluster_id
+          required: true
+          type: string
+      responses:
+        "200":
+          description: A list of labels
+          schema:
+            $ref: "#/definitions/ClusterLabels"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /organizations/{organization_id}/clusters/{cluster_id}/labels/{label_id}:
+    get:
+      summary: Get a label
+      operationId: getLabel
+      tags:
+        - label
+      parameters:
+        - in: path
+          name: organization_id
+          required: true
+          type: string
+        - in: path
+          name: cluster_id
+          required: true
+          type: string
+        - in: path
+          name: label_id
+          required: true
+          type: string
+      responses:
+        "200":
+          description: A label
+          schema:
+            $ref: "#/definitions/ClusterLabel"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+
   /organizations:
     get:
       summary: List all organizations
@@ -505,6 +559,33 @@ definitions:
         type: string
       description:
         title: Provider description
+        type: string
+
+  ClusterLabels:
+    type: array
+    items:
+      $ref: "#/definitions/ClusterLabel"
+
+  ClusterLabel:
+    type: object
+    required:
+      - key
+      - value
+    properties:
+      created_at:
+        title: Timestamp at which the label was created
+        type: string
+      updated_at:
+        title: Timestamp at which the label was updated
+        type: string
+      id:
+        title: Cluster label ID
+        $ref: "#/definitions/UUID"
+      key:
+        title: Label key
+        type: string
+      value:
+        title: Label value
         type: string
 
   Providers:
@@ -913,6 +994,15 @@ definitions:
     type: string
     minLength: 36
     maxLength: 36
+
+  IDResponse:
+    type: object
+    required:
+      - id
+    properties:
+      id:
+        title: ID of some resource
+        $ref: '#/definitions/UUID'
 
   Error:
     required:

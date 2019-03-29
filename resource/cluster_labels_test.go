@@ -6,41 +6,41 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/containership/csctl/cloud/provision/types"
+	"github.com/containership/csctl/cloud/api/types"
 )
 
 var (
-	nodePoolLabelTime = "1517001176920"
+	clusterLabelTime = "1517001176920"
 
-	nodePoolLabels = []types.NodePoolLabel{
+	clusterLabels = []types.ClusterLabel{
 		{
 			ID:        types.UUID("1234"),
 			Key:       strptr("key1"),
 			Value:     strptr("value1"),
-			CreatedAt: nodePoolLabelTime,
-			UpdatedAt: nodePoolLabelTime,
+			CreatedAt: clusterLabelTime,
+			UpdatedAt: clusterLabelTime,
 		},
 		{
 			ID:        types.UUID("4321"),
 			Key:       strptr("key2"),
 			Value:     strptr("value2"),
-			CreatedAt: nodePoolLabelTime,
-			UpdatedAt: nodePoolLabelTime,
+			CreatedAt: clusterLabelTime,
+			UpdatedAt: clusterLabelTime,
 		},
 	}
 
-	nodePoolLabelsSingle = []types.NodePoolLabel{
+	clusterLabelsSingle = []types.ClusterLabel{
 		{
 			ID:        types.UUID("1234"),
 			Key:       strptr("key3"),
 			Value:     strptr("value3"),
-			CreatedAt: nodePoolLabelTime,
-			UpdatedAt: nodePoolLabelTime,
+			CreatedAt: clusterLabelTime,
+			UpdatedAt: clusterLabelTime,
 		},
 	}
 )
 
-func TestNewNodePoolLabels(t *testing.T) {
+func TestNewClusterLabels(t *testing.T) {
 	a := NewNodes(nil)
 	assert.NotNil(t, a)
 
@@ -52,10 +52,10 @@ func TestNewNodePoolLabels(t *testing.T) {
 	assert.NotNil(t, a)
 }
 
-func TestNodePoolLabelsTable(t *testing.T) {
+func TestClusterLabelsTable(t *testing.T) {
 	buf := new(bytes.Buffer)
 
-	a := NewNodePoolLabels(nodePoolLabels)
+	a := NewClusterLabels(clusterLabels)
 	assert.NotNil(t, a)
 
 	err := a.Table(buf)
@@ -68,9 +68,9 @@ func TestNodePoolLabelsTable(t *testing.T) {
 	assert.Equal(t, len(nodes), info.numRows)
 }
 
-func TestNodePoolLabelsJSON(t *testing.T) {
+func TestClusterLabelsJSON(t *testing.T) {
 	buf := new(bytes.Buffer)
-	a := NewNodePoolLabels(nodePoolLabelsSingle)
+	a := NewClusterLabels(clusterLabelsSingle)
 	err := a.JSON(buf)
 	assert.Nil(t, err)
 	a.resource.DisableListView()
@@ -78,9 +78,9 @@ func TestNodePoolLabelsJSON(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestNodePoolLabelsYAML(t *testing.T) {
+func TestClusterLabelsYAML(t *testing.T) {
 	buf := new(bytes.Buffer)
-	a := NewNodePoolLabels(nodePoolLabelsSingle)
+	a := NewClusterLabels(clusterLabelsSingle)
 	err := a.YAML(buf)
 	assert.Nil(t, err)
 	a.resource.DisableListView()
@@ -88,29 +88,29 @@ func TestNodePoolLabelsYAML(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestBuildNodePoolLabelString(t *testing.T) {
+func TestBuildClusterLabelString(t *testing.T) {
 	type stringTest struct {
-		label    types.NodePoolLabel
+		label    types.ClusterLabel
 		expected string
 	}
 
 	var tests = []stringTest{
 		{
-			label: types.NodePoolLabel{
+			label: types.ClusterLabel{
 				Key:   strptr("nodepool.containership.io/key1"),
 				Value: strptr("value1"),
 			},
 			expected: "nodepool.containership.io/key1=value1",
 		},
 		{
-			label: types.NodePoolLabel{
+			label: types.ClusterLabel{
 				Key:   strptr("nodepool.containership.io/nil-value"),
 				Value: nil,
 			},
 			expected: "nodepool.containership.io/nil-value=",
 		},
 		{
-			label: types.NodePoolLabel{
+			label: types.ClusterLabel{
 				Key:   strptr("nodepool.containership.io/empty-value"),
 				Value: nil,
 			},
@@ -119,7 +119,7 @@ func TestBuildNodePoolLabelString(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		result := buildNodePoolLabelString(test.label)
+		result := buildClusterLabelString(test.label)
 		assert.Equal(t, test.expected, result)
 	}
 }

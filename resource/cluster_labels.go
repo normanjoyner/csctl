@@ -3,37 +3,37 @@ package resource
 import (
 	"io"
 
-	"github.com/containership/csctl/cloud/provision/types"
+	"github.com/containership/csctl/cloud/api/types"
 	"github.com/containership/csctl/pkg/convert"
 	"github.com/containership/csctl/resource/label"
 	"github.com/containership/csctl/resource/table"
 )
 
-// NodePoolLabels is a list of the associated cloud resource with additional functionality
-type NodePoolLabels struct {
+// ClusterLabels is a list of the associated cloud resource with additional functionality
+type ClusterLabels struct {
 	resource
-	items []types.NodePoolLabel
+	items []types.ClusterLabel
 }
 
-// NewNodePoolLabels constructs a new NodePoolLabels wrapping the given cloud type
-func NewNodePoolLabels(items []types.NodePoolLabel) *NodePoolLabels {
-	return &NodePoolLabels{
+// NewClusterLabels constructs a new ClusterLabels wrapping the given cloud type
+func NewClusterLabels(items []types.ClusterLabel) *ClusterLabels {
+	return &ClusterLabels{
 		resource: resource{
-			name:    "node-pool-label",
-			plural:  "node-pool-labels",
-			aliases: []string{"npl", "npls"},
+			name:    "cluster-label",
+			plural:  "cluster-labels",
+			aliases: []string{"cl", "cls"},
 		},
 		items: items,
 	}
 }
 
-// NodePoolLabel constructs a new NodePoolLabels with no underlying items, useful for
+// ClusterLabel constructs a new ClusterLabels with no underlying items, useful for
 // interacting with the metadata itself.
-func NodePoolLabel() *NodePoolLabels {
-	return NewNodePoolLabels(nil)
+func ClusterLabel() *ClusterLabels {
+	return NewClusterLabels(nil)
 }
 
-func (p *NodePoolLabels) columns() []string {
+func (p *ClusterLabels) columns() []string {
 	return []string{
 		"ID",
 		"Label",
@@ -43,13 +43,13 @@ func (p *NodePoolLabels) columns() []string {
 }
 
 // Table outputs the table representation to the given writer
-func (p *NodePoolLabels) Table(w io.Writer) error {
+func (p *ClusterLabels) Table(w io.Writer) error {
 	table := table.New(w, p.columns())
 
 	for _, l := range p.items {
 		table.Append([]string{
 			string(l.ID),
-			buildNodePoolLabelString(l),
+			buildClusterLabelString(l),
 			convert.UnixTimeMSToString(l.CreatedAt),
 			convert.UnixTimeMSToString(l.UpdatedAt),
 		})
@@ -61,23 +61,23 @@ func (p *NodePoolLabels) Table(w io.Writer) error {
 }
 
 // JSON outputs the JSON representation to the given writer
-func (p *NodePoolLabels) JSON(w io.Writer) error {
+func (p *ClusterLabels) JSON(w io.Writer) error {
 	return displayJSON(w, p.items, p.listView)
 }
 
 // YAML outputs the YAML representation to the given writer
-func (p *NodePoolLabels) YAML(w io.Writer) error {
+func (p *ClusterLabels) YAML(w io.Writer) error {
 	return displayYAML(w, p.items, p.listView)
 }
 
 // JSONPath outputs the executed JSONPath template to the given writer
-func (p *NodePoolLabels) JSONPath(w io.Writer, template string) error {
+func (p *ClusterLabels) JSONPath(w io.Writer, template string) error {
 	return displayJSONPath(w, template, p.items)
 }
 
 // buildLabel string returns a string representing the given label.
 // It assumes that the label is well-formed (i.e. it has a non-empty key)
-func buildNodePoolLabelString(l types.NodePoolLabel) string {
+func buildClusterLabelString(l types.ClusterLabel) string {
 	var key, value string
 	if l.Key != nil {
 		key = *l.Key

@@ -7,8 +7,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-// NodePoolPrefix is the prefix required for any user-defined node pool labels
-const NodePoolPrefix = "nodepool.containership.io"
+const (
+	// NodePoolPrefix is the prefix required for any node pool labels
+	NodePoolPrefix = "nodepool.containership.io"
+	// ClusterPrefix is the prefix required for any cluster labels
+	ClusterPrefix = "cluster.containership.io"
+)
 
 // ParseString parses a string of the form key=value and returns
 // the key and value or an error.

@@ -245,7 +245,7 @@ paths:
 
   /organizations/{organization_id}/clusters/{cluster_id}/node-pools/{node_pool_id}/labels:
     get:
-      summary: List all labels in a given node pool
+      summary: List all labels for a given node pool
       operationId: listLabels
       tags:
         - labels
